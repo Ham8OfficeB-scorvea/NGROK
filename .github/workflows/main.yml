@@ -25,9 +25,9 @@ jobs:
 
     - name: Create RDP User
       run: |
-        net user Ham7Office MyStrong123 /add /Y
-        net localgroup administrators Ham7Office /add
-        reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" /v Ham7Office /t REG_DWORD /d 0 /f
+        net user ${{ secrets.RDP_USER }} ${{ secrets.RDP_PASS }} /add /Y
+        net localgroup administrators ${{ secrets.RDP_USER }} /add
+        reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" /v ${{ secrets.RDP_USER }} /t REG_DWORD /d 0 /f
 
     - name: Download, Extract, and Fix Permissions
       run: |
@@ -48,7 +48,7 @@ jobs:
             if ($_.IsReadOnly) { $_.IsReadOnly = $false }
         }
         
-        icacls "$DesktopPath\*" /grant "Ham7Office:(OI)(CI)F" /T /C /Q
+        icacls "$DesktopPath\*" /grant "${{ secrets.RDP_USER }}:(OI)(CI)F" /T /C /Q
         
         Write-Host "تم فك الضغط وتجهيز الصلاحيات بنجاح على سطح المكتب!"
 
@@ -87,8 +87,8 @@ jobs:
         Write-Output "||        RDP CONNECTION DETAILS        ||"
         Write-Output "=========================================="
         Write-Output "Address: $tunnelUrl"
-        Write-Output "Username: Ham7Office"
-        Write-Output "Password: MyStrong123"
+        Write-Output "Username: ${{ secrets.RDP_USER }}"
+        Write-Output "Password: ${{ secrets.RDP_PASS }}"
         Write-Output "------------------------------------------"
         Write-Output "1. Open Remote Desktop (Win+R → mstsc)"
         Write-Output "2. Connect to: $tunnelUrl"
